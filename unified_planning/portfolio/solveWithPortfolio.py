@@ -10,27 +10,35 @@
 # ---------------------------------------------
 import os  # path
 import sys  # argv, exit
-
-# ---------------------------------------------
+import warnings
 import unified_planning
-from unified_planning.io.pddl_reader import *
-from unified_planning.io.pddl_writer import *
+# ---------------------------------------------
+
 from unified_planning.shortcuts import *
-
-
- # function 3
+# Function using the planners present in a given list to solve a given problem
 def _solveWithPortfolio(plannerList, timeLimit, problem):
-    
-        # Check if all arguments are correct
+        """
+        Returns the first `plan` found by a planner inside the `list` given.
+
+        :param plannerList: List of planners to use
+        :param timeLimit: Maximum time limit to run the operation
+        :problem: Problem to be solved
+        :return: First not null solution found, otherwise `None`
+        """
+
+        # Check if arguments are correct
+
+        """Check if the `plannerList` is empty"""
         if not plannerList:
             print("ERROR::::Planner list is empty!")
             sys.exit(-1) 
 
+        """Check if the `timeLimit` has an invalid value"""
         if timeLimit < 0:
             print("ERROR::::Invalid quantity of time assigned!")
             sys.exit(-1) 
 
-        # Calculate time to allocate to each planner
+        """Calculate time to allocate to each planner"""
         timeAllocated = timeLimit / (len(plannerList))
 
         print("******** LIST OF PLANNERS USED ********")
@@ -43,16 +51,44 @@ def _solveWithPortfolio(plannerList, timeLimit, problem):
         print("** Time Allocated for each planner: ", timeAllocated)
         print("***************************************")    
 
+        
+        """Solve the `problem` with each planner inside the `list`"""
         for p in plannerList:
             with OneshotPlanner(name = p) as planner:
-                result = planner.solve(problem, timeout=timeAllocated)
-                print(f"{planner.name} found this plan: {result.plan}")
-        
-        return result
+                    warnings.filterwarnings("error")
+                    try:
+                        result = planner.solve(problem, timeout=timeAllocated)
 
-# if __name__ == '__main__':
+                        if result.plan is not None:
+                            """Return the first `plan` found"""
+                            print(f"{planner.name} found this plan: {result.plan}")
+                            return result
+                        else:
+                            print(f"{planner.name} couldn't find a plan")
+                        
+                    except UserWarning:
+                        print(UserWarning)
+
+        # for p in plannerList:
+        #     with OneshotPlanner(name = p) as planner:
+
+        #         with warnings.catch_warnings(record=True) as caught_warnings:
+        #             warnings.filterwarnings("always")
+        #             result = planner.solve(problem, timeout=timeAllocated)
+                    
+        #             for warn in caught_warnings:
+        #                 print(warn.message)
+
+        #             if result.plan is not None:
+        #                 """Return the first `plan` found"""
+        #                 print(f"{planner.name} found this plan: {result.plan}")
+        #                 return result
+        #             else:
+        #                 print(f"{planner.name} couldn't find a plan")
+                    
+"""Create default `problem` from Documentation to test the function"""
+up.shortcuts.get_env().credits_stream = None 
 x = Fluent("x")
-
 a = InstantaneousAction("a")
 a.add_precondition(Not(x))
 a.add_effect(x, True)
@@ -61,11 +97,10 @@ problem = Problem("basic")
 problem.add_fluent(x)
 problem.add_action(a)
 problem.set_initial_value(x, False)
-problem.add_goal(x)
+problem.add_goal(x)      
 
-plan = _solveWithPortfolio(['enhsp'], 5, problem)
-
-print(plan)
+result = _solveWithPortfolio(['enhsp','tamer','fast-downward'], 6, problem)
+print(result.plan)        
 
 
 
