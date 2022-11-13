@@ -22,7 +22,7 @@ def _solveWithPortfolio(plannerList, timeLimit, problem):
 
         :param plannerList: List of planners to use
         :param timeLimit: Maximum time limit to run the operation
-        :problem: Problem to be solved
+        :param problem: Problem to be solved
         :return: First not null solution found, otherwise `None`
         """
 
