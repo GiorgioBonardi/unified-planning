@@ -31,7 +31,7 @@ res = []
 for p in plannerList:
     with OneshotPlanner(name=p) as planner:
         result = planner.solve(problem)
-        toBeAppended = planner.name + " " + result.status in unified_planning.engines.results.POSITIVE_OUTCOMES
+        toBeAppended = ","+ p + ", " + str(result.status in unified_planning.engines.results.POSITIVE_OUTCOMES)
         res.append(toBeAppended)
 # with OneshotPlanner(name='fast-downward') as planner:
 #     result = planner.solve(problem, timeout=5)
