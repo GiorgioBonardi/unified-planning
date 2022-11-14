@@ -39,36 +39,66 @@ def extract_features(original_domain, original_problem, rootpathOutput):
 
 #domain
 #problem
-#planner_list = list of planners who support the problem
+#requestedPlanners = list of planners who support the problem
 #n = max number of planner in the portfolio
 #Output. Un elenco di N pianificatori ordinato
 # Procedura. Estrarre le feature per P. 
 # Invocare Weka con le feature estratte per ricavare la probabilità di successo dei vari pianificatori integrati in UP nel risolvere P. 
 # Ordinare L sulla base della probabilità di successo. Restituire i primi N elementi di L
-def portfolio_specific_problem(domain, problem, planner_list, n):
+
+#TODO: Possible CHECK for existance of `domain` and `problem`
+#TODO: Possible CHECK for `requestedPlanners` size to be >= n with n > 1 
+def portfolio_specific_problem(domain, problem, requestedPlanners, n):
+    """
+        Returns the `list` of `planners` to be used to solve the given `problem`, sorted by probability of success.
+
+        :param domain: `Domain` of the `problem` to be solved
+        :param problem: `Problem` to be solved
+        :param requestedPlanners: List of planners to use
+        :param n: Number of `planners` to be used to solve the given `problem`
+        
+        :return: `List` of `planners` ordered by probability of success
+        """
     
+    """ Extracting `features` of the given `problem` """
+    #TODO: Should be independent from this file
     extract_features(domain, problem, currentpath)
 
     #rimozione attributi 
+    """ Call to `weka.jar` to remove unused `features` """
     command = "java -cp "+ currentpath +"/models/weka.jar -Xms256m -Xmx1024m weka.filters.unsupervised.attribute.Remove -R 1-3,18,20,65,78-79,119-120 -i "+ pathname + "/global_features.arff -o "+ pathname +"/global_features_simply.arff"
     os.system(command)
     #far predirre a weka
     #ottiene la lista dei pianificatori ordinata per probabilità di successo
+    """ The `model` creates the `list` of ALL planners relative to their probability of solving the `problem` """
     command = "python2.7 "+ currentpath +"/models/parseWekaOutputFile.py "+   currentpath +"/outputModel " + currentpath +"/listPlanner"
     os.system(command)
 
-    #analisi di listPlanner e tenere solo quelli presenti in planner_list (forse inutile passare planner_list?)
+    #analisi di listPlanner e tenere solo quelli presenti in requestedPlanners (forse inutile passare requestedPlanners?)
+    #TODO: Possible to use listPlanner as a variable and not as a file?
+    """ Create the `list` of `planners` from the file """
     with open(currentpath +"/listPlanner") as file:
-        list_planner = [next(file) for x in range(n)]
-    print(list_planner)#da togliere i vari \n
+        listPlanner = [next(file) for x in range(n)] #TODO: If we only take n from all planners, maybe we exclude some of the requested ones
+
+    tempList = listPlanner
+    #TODO: Model gives us a list of ALL the planners with their respective % of success
+    # so if a planner has 0% it is still present, but maybe it isn't requested by input so it must be removed
+    """ Removal of `planners` inside `listPlanner` that are not requested """
+    for planner in listPlanner:
+        if planner not in requestedPlanners:
+            tempList.remove(planner)
+
+    #TODO: Consider only the first `n` planners inside tempList
+
+    return tempList #da togliere i vari \n
 
     
 
 if __name__ == '__main__':
     pathname = os.getcwd()
     currentpath = os.path.abspath(pathname)
-    portfolio_specific_problem(currentpath + "/domain.pddl", currentpath + "/problem.pddl", [], 2)
-
+    truePlannerList = portfolio_specific_problem(currentpath + "/domain.pddl", currentpath + "/problem.pddl", [], 2)
+    print(truePlannerList)
     # pathname = os.getcwd()
     # currentpath = os.path.abspath(pathname)
     # rootpath = os.path.abspath(os.path.join(currentpath,"..")) + "/training"
