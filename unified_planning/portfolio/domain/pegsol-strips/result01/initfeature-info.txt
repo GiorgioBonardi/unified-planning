@@ -1,0 +1,1 @@
+  1, /home/gio/Desktop/up_update/ExtractModel/domain/pegsol-strips/p01.pddl, 60, 83, 4, 4, 1.000000, -4, 0.000000, 0.730297, 0, 0.300000, 0.458258, 3.228916, 1.072289, 13
