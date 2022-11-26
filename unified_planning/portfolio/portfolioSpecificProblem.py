@@ -39,7 +39,7 @@ def extract_features(original_domain, original_problem, rootpathOutput):
 
 #domain
 #problem
-#requestedPlanners = list of planners who support the problem
+#requested_planners = list of planners who support the problem
 #n = max number of planner in the portfolio
 #Output. Un elenco di N pianificatori ordinato
 # Procedura. Estrarre le feature per P. 
@@ -47,50 +47,49 @@ def extract_features(original_domain, original_problem, rootpathOutput):
 # Ordinare L sulla base della probabilità di successo. Restituire i primi N elementi di L
 
 #TODO: Possible CHECK for existance of `domain` and `problem`
-#TODO: Possible CHECK for `requestedPlanners` size to be >= n with n > 1 
-def portfolio_specific_problem(domain, problem, requestedPlanners, n):
+#TODO: Possible CHECK for `requested_planners` size to be >= n with n > 1 
+def portfolio_specific_problem(domain, problem, requested_planners, n):
     """
         Returns the `list` of `planners` to be used to solve the given `problem`, sorted by probability of success.
 
         :param domain: `Domain` of the `problem` to be solved
         :param problem: `Problem` to be solved
-        :param requestedPlanners: List of planners to use
+        :param requested_planners: List of planners to use
         :param n: Number of `planners` to be used to solve the given `problem`
         
         :return: `List` of `planners` ordered by probability of success
         """
     
-    """ Extracting `features` of the given `problem` """
+    # Extracting `features` of the given `problem`
     #TODO: Should be independent from this file
     extract_features(domain, problem, currentpath)
 
-    #rimozione attributi 
-    """ Call to `weka.jar` to remove unused `features` """
+    #Call to `weka.jar` to remove unused `features`
     command = "java -cp "+ currentpath +"/models/weka.jar -Xms256m -Xmx1024m weka.filters.unsupervised.attribute.Remove -R 1-3,18,20,65,78-79,119-120 -i "+ pathname + "/global_features.arff -o "+ pathname +"/global_features_simply.arff"
     os.system(command)
     #far predirre a weka
     #ottiene la lista dei pianificatori ordinata per probabilità di successo
-    """ The `model` creates the `list` of ALL planners relative to their probability of solving the `problem` """
+    command = "java -Xms256m -Xmx1024m -cp "+ currentpath +"/models/weka.jar weka.classifiers.meta.RotationForest -l "+ currentpath +"/models/RotationForest.model -T "+ currentpath +"/global_features_simply.arff -p 113 > "+  currentpath +"/outputModel"
+    os.system(command)
+    #The `model` creates the `list` of ALL planners relative to their probability of solving the `problem`
     command = "python2.7 "+ currentpath +"/models/parseWekaOutputFile.py "+   currentpath +"/outputModel " + currentpath +"/listPlanner"
     os.system(command)
 
-    #analisi di listPlanner e tenere solo quelli presenti in requestedPlanners (forse inutile passare requestedPlanners?)
+    #analisi di listPlanner e tenere solo quelli presenti in requested_planners (forse inutile passare requested_planners?)
     #TODO: Possible to use listPlanner as a variable and not as a file?
-    """ Create the `list` of `planners` from the file """
+    #Create the `list` of `planners` from the file
     with open(currentpath +"/listPlanner") as file:
-        listPlanner = [next(file) for x in range(n)] #TODO: If we only take n from all planners, maybe we exclude some of the requested ones
+        #list_planners = [next(file) for x in range(n) if file in planner_list]
+        list_planners = []
+        x = 0
+        for line in file:
+            line = line.strip()
+            if(line in requested_planners):
+                list_planners.append(line)
+                x+=1
+            if(x == n): break
 
-    tempList = listPlanner
-    #TODO: Model gives us a list of ALL the planners with their respective % of success
-    # so if a planner has 0% it is still present, but maybe it isn't requested by input so it must be removed
-    """ Removal of `planners` inside `listPlanner` that are not requested """
-    for planner in listPlanner:
-        if planner not in requestedPlanners:
-            tempList.remove(planner)
-
-    #TODO: Consider only the first `n` planners inside tempList
-
-    return tempList #da togliere i vari \n
+    return list_planners
 
     
 
