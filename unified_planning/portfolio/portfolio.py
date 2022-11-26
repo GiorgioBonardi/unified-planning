@@ -10,6 +10,15 @@ class Portfolio():
         #init
         pass
 
+    # @property
+    # def name(self) -> str:
+    #     """Returns the portfolio name."""
+    #     return self._name
+
+    # @name.setter
+    # def name(self, new_name) -> str:
+    #     self._name = new_name
+
     def extract_features(
         self,
         problem: str,
