@@ -7,7 +7,7 @@ import os               # path and process management
 import sys              # argv, exit
 
 
-#TODO: da aggiungere i limiti presenti in solve_agl?
+#TODO: potrebbe ritornare il path di global_features.arff(?)
 def extract_features(original_domain, original_problem, rootpathOutput):
     print("\n***start extract features***\n")
     #features
@@ -37,6 +37,12 @@ def extract_features(original_domain, original_problem, rootpathOutput):
 
     print("\n***end extract features***\n")
 
+    if(os.path.isfile(rootpathOutput + "/global_features.arff")):
+        return os.path.getsize(rootpathOutput + "/global_features.arff") != 0
+    else:
+        return False
+    
+
 #domain
 #problem
 #requested_planners = list of planners who support the problem
@@ -62,34 +68,37 @@ def portfolio_specific_problem(domain, problem, requested_planners, n):
     
     # Extracting `features` of the given `problem`
     #TODO: Should be independent from this file
-    extract_features(domain, problem, currentpath)
+    if(extract_features(domain, problem, currentpath)):
+        #Call to `weka.jar` to remove unused `features`
+        command = "java -cp "+ currentpath +"/models/weka.jar -Xms256m -Xmx1024m weka.filters.unsupervised.attribute.Remove -R 1-3,18,20,65,78-79,119-120 -i "+ pathname + "/global_features.arff -o "+ pathname +"/global_features_simply.arff"
+        os.system(command)
+        #far predirre a weka
+        #ottiene la lista dei pianificatori ordinata per probabilità di successo
+        command = "java -Xms256m -Xmx1024m -cp "+ currentpath +"/models/weka.jar weka.classifiers.meta.RotationForest -l "+ currentpath +"/models/RotationForest.model -T "+ currentpath +"/global_features_simply.arff -p 113 > "+  currentpath +"/outputModel"
+        os.system(command)
+        #The `model` creates the `list` of ALL planners relative to their probability of solving the `problem`
+        command = "python2.7 "+ currentpath +"/models/parseWekaOutputFile.py "+   currentpath +"/outputModel " + currentpath +"/listPlanner"
+        os.system(command)
 
-    #Call to `weka.jar` to remove unused `features`
-    command = "java -cp "+ currentpath +"/models/weka.jar -Xms256m -Xmx1024m weka.filters.unsupervised.attribute.Remove -R 1-3,18,20,65,78-79,119-120 -i "+ pathname + "/global_features.arff -o "+ pathname +"/global_features_simply.arff"
-    os.system(command)
-    #far predirre a weka
-    #ottiene la lista dei pianificatori ordinata per probabilità di successo
-    command = "java -Xms256m -Xmx1024m -cp "+ currentpath +"/models/weka.jar weka.classifiers.meta.RotationForest -l "+ currentpath +"/models/RotationForest.model -T "+ currentpath +"/global_features_simply.arff -p 113 > "+  currentpath +"/outputModel"
-    os.system(command)
-    #The `model` creates the `list` of ALL planners relative to their probability of solving the `problem`
-    command = "python2.7 "+ currentpath +"/models/parseWekaOutputFile.py "+   currentpath +"/outputModel " + currentpath +"/listPlanner"
-    os.system(command)
+        #analisi di listPlanner e tenere solo quelli presenti in requested_planners (forse inutile passare requested_planners?)
+        #TODO: Possible to use listPlanner as a variable and not as a file?
+        #Create the `list` of `planners` from the file
+        with open(currentpath +"/listPlanner") as file:
+            #list_planners = [next(file) for x in range(n) if file in planner_list]
+            list_planners = []
+            x = 0
+            for line in file:
+                line = line.strip()
+                if(line in requested_planners):
+                    list_planners.append(line)
+                    x+=1
+                if(x == n): break
 
-    #analisi di listPlanner e tenere solo quelli presenti in requested_planners (forse inutile passare requested_planners?)
-    #TODO: Possible to use listPlanner as a variable and not as a file?
-    #Create the `list` of `planners` from the file
-    with open(currentpath +"/listPlanner") as file:
-        #list_planners = [next(file) for x in range(n) if file in planner_list]
-        list_planners = []
-        x = 0
-        for line in file:
-            line = line.strip()
-            if(line in requested_planners):
-                list_planners.append(line)
-                x+=1
-            if(x == n): break
+        return list_planners
+    else:
+        return []
 
-    return list_planners
+    
 
     
 
