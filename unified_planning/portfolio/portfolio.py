@@ -1,37 +1,33 @@
 """This module defines the portfolio interface."""
 
-class Portfolio():
+
+class Portfolio:
     """
     Represents the portfolio interface that must be implemented.
     """
 
+    def __init__(self, name):
+        self.name = name
 
-    def __init__(self):
-        #init
-        pass
-
-    # @property
-    # def name(self) -> str:
-    #     """Returns the portfolio name."""
-    #     return self._name
+    @property
+    def name(self) -> str:
+        """Returns the portfolio name."""
+        return self._name
 
     # @name.setter
-    # def name(self, new_name) -> str:
-    #     self._name = new_name
+    # def name(self, name) -> str:
+    #     self._name = name
 
     def extract_features(
-        self,
-        problem: str,
-        domain: str,
-        path_output: str
-    ) -> bool: #le facciamo ritornare un bool/niente/path di global_features.arff(?)/bo
+        self, problem: str, domain: str, output_path: str
+    ) -> bool:  # le facciamo ritornare un bool/niente/path o (VINCITORE) variabile che contiene global_features.arff(?)/bo
         """
         Takes a problem, a filename and a map of renaming and returns the plan parsed from the file.
-        Takes a problem path, a domain path and an output path and return a boolean indicating whether the extraction was successful 
+        Takes a problem path, a domain path and an output path and return a boolean indicating whether the extraction was successful
         :param problem: The up.model.problem.Problem instance for which the plan is generated.
         :param problem: The path of the problem.
         :param domain: The path of the domain.
-        :param path_output: The path of the output.
+        :param output_path: The path of the output.
         :return: True if the extraction was succesfully made
         """
 
