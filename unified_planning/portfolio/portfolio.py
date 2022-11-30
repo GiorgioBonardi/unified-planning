@@ -1,8 +1,9 @@
 """This module defines the portfolio interface."""
-
+import unified_planning as up
 from unified_planning.engines import ValidationResultStatus
 from unified_planning.shortcuts import OneshotPlanner, PlanValidator
 from multiprocessing import Process, Pipe
+from typing import List
 
 # Custom Process class that supports solving of a `problem` with the given `planner` and sends the result through a Pipe estabilished connection
 class SolverProcess(Process):
@@ -27,33 +28,31 @@ class Portfolio:
     Represents the portfolio interface that must be implemented.
     """
 
-    def __init__(self, name):
-        self.name = name
+    # def __init__(self, name):
+    #     self.name = name
 
-    @property
-    def name(self) -> str:
-        """Returns the portfolio name."""
-        return self._name
+    # @property
+    # def name(self) -> str:
+    #     """Returns the portfolio name."""
+    #     return self._name
 
     # @name.setter
     # def name(self, name) -> str:
     #     self._name = name
 
     def extract_features(
-        self, problem: str, domain: str, output_path: str
-    ) -> bool:  # le facciamo ritornare un bool/niente/path o (VINCITORE) variabile che contiene global_features.arff(?)/bo
+        self, problem: "up.model.AbstractProblem"
+    ) -> List[
+        str
+    ]:  # le facciamo ritornare un bool/niente/path o (VINCITORE) variabile che contiene global_features.arff(?)/bo
         """
-        Takes a problem, a filename and a map of renaming and returns the plan parsed from the file.
-        Takes a problem path, a domain path and an output path and return a boolean indicating whether the extraction was successful
-        :param problem: The up.model.problem.Problem instance for which the plan is generated.
-        :param problem: The path of the problem.
-        :param domain: The path of the domain.
-        :param output_path: The path of the output.
+        Takes a problem and returns a list of strings containing its features
+        :param problem: The up.model.AbstractProblem instance from which to extract the features.
         :return: True if the extraction was succesfully made
         """
 
     # Function using the planners present in a given list to solve a given problem
-    def _solveWithPortfolio(plannerList, timeLimit, problem):
+    def solve_with_portfolio(self, plannerList, timeLimit, problem):
         """
         Returns the first `plan` found by a planner inside the `list` given.
 
@@ -62,12 +61,8 @@ class Portfolio:
         :param problem: Parsed problem to be solved
         :return: First not null `plan` found, otherwise `None`
         """
-        # Check if arguments are correct
 
-        # Check if the `plannerList` is empty
         assert plannerList, "Planner list is empty!"
-
-        # Check if the `timeLimit` has an invalid value
         assert timeLimit > 0, "Invalid quantity of time assigned!"
 
         # Calculate time to allocate to each planner

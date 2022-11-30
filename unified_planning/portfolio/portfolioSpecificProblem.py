@@ -99,13 +99,14 @@ def portfolio_specific_problem(problem, planners_requested, planners_allowed):
 
     :return: `List` of `planners` ordered by probability of success
     """
-    assert isinstance(problem, up.model.AbstractProblem)
+    assert isinstance(problem, up.model.Problem)
     assert planners_allowed > 1, "at least one planner is required"
     assert (
         planners_requested >= planners_allowed
     ), "the list of planners must be grater or equal to the number of planners"
 
     # Extracting `features` of the given `problem`
+    # TODO: self.extract_features(problem, currentpath)
     if extract_features(problem, currentpath):
         # Call to `weka.jar` to remove unused `features`
         command = (
