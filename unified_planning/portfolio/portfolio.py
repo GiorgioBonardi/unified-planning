@@ -1,8 +1,6 @@
 """This module defines the portfolio interface."""
 import unified_planning as up
-
-# from unified_planning.engines import ValidationResultStatus
-from unified_planning.shortcuts import OneshotPlanner  # , PlanValidator
+from unified_planning.shortcuts import OneshotPlanner
 from unified_planning.exceptions import UPException
 from multiprocessing import Process, Pipe
 from typing import List
@@ -15,7 +13,7 @@ class SolverProcess(Process):
         self._planner = planner
         self._problem = problem
 
-    # override the run function
+    # Overriding the run function
     def run(self):
         try:
             result = self._planner.solve(self._problem)
@@ -42,15 +40,11 @@ class Portfolio:
     # def name(self, name) -> str:
     #     self._name = name
 
-    def extract_features(
-        self, problem: "up.model.AbstractProblem"
-    ) -> List[
-        str
-    ]:  # le facciamo ritornare un bool/niente/path o (VINCITORE) variabile che contiene global_features.arff(?)/bo
+    def extract_features(self, problem: "up.model.AbstractProblem") -> List[str]:
         """
         Takes a problem and returns a list of strings containing its features
         :param problem: The up.model.AbstractProblem instance from which to extract the features.
-        :return: True if the extraction was succesfully made
+        :return: List of lines representing the extracted features
         """
 
     def create_model(self, features: List[str]) -> str:  # o dataset?
@@ -70,17 +64,18 @@ class Portfolio:
 
     # primitiva 2
     def portfolio_specific_problem(
-        self, problem, planners_requested, n_planners_allowed
-    ):
+        self,
+        problem: "up.model.AbstractProblem",
+        planners_requested: List[str],
+        n_planners_allowed: List[str],
+    ) -> List[str]:
         """
-        Returns the `list` of `planners` to be used to solve the given `problem`, sorted by probability of success.
+        Returns the list of planners to be used to solve the given problem, sorted by probability of success.
 
-        :param domain: `Domain` of the `problem` to be solved
-        :param problem: `Problem` to be solved
-        :param planners_requested: List of 'planners' who support the 'problem'
-        :param n_planners_allowed: Number of `planners` allowed in the portfolio
-
-        :return: `List` of `planners` ordered by probability of success
+        :param problem: The up.model.AbstractProblem instance to be solved
+        :param planners_requested: List of planners who support the problem
+        :param n_planners_allowed: Number of planners allowed in the portfolio
+        :return: List of planners ordered by probability of success
         """
         assert isinstance(problem, up.model.Problem)
         assert n_planners_allowed > 1, "at least one planner is required"
@@ -107,8 +102,6 @@ class Portfolio:
 
         return list_planners
 
-    # primitive 2
-    # Function using the planners present in a given list to solve a given problem
     def solve_with_portfolio(
         self,
         plannerList: List[str],
@@ -116,12 +109,12 @@ class Portfolio:
         problem: "up.model.AbstractProblem",
     ) -> "up.engines.results.PlanGenerationResult":
         """
-        Returns the first `result` found by a planner inside the `list` given.
+        Returns the first result found by a planner inside the list given.
 
         :param plannerList: List of planners to use
         :param timeLimit: Maximum time limit to run the operation
         :param problem: Parsed problem to be solved
-        :return: First not null `result` found, otherwise `None`
+        :return: First not null result found, otherwise None
         """
 
         assert plannerList, "Planner list is empty!"
@@ -174,23 +167,6 @@ class Portfolio:
                     )
                     continue
 
-                # if plan is not None:
-                #     # Validate the plan found
-                #     print(f"{p} found this plan: {plan}")
-                #     try:
-                #         with PlanValidator(problem_kind=problem.kind) as validator:
-                #             val = validator.validate(problem, plan)
-                #         print(val.status)
-                #         if val.status == ValidationResultStatus.VALID:
-                #             # Return the first correctly validated `plan`
-                #             return result
-                #     except:
-                #         print(
-                #             f"{p} has encountered an exception while attempting to validate the plan"
-                #         )
-                #         continue
-                # else:
-                #     print(f"{p} couldn't find a plan")
         raise UPException("Portfolio failed to find a plan")
 
     def destroy(self):
