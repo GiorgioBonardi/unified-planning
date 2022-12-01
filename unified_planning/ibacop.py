@@ -30,7 +30,7 @@ class ibacop(Portfolio):
                 + "/features/translate/translate.py "
                 + domain_filename
                 + " "
-                + problem
+                + problem_filename
             )
             print(command)
             os.system(command)
@@ -48,7 +48,7 @@ class ibacop(Portfolio):
                 + "/features/ff-learner/roller3.0 -o "
                 + domain_filename
                 + " -f "
-                + problem
+                + problem_filename
                 + " -S 28"
             )
             os.system(command)
@@ -58,7 +58,7 @@ class ibacop(Portfolio):
                 + "/features/heuristics/training.sh "
                 + domain_filename
                 + " "
-                + problem
+                + problem_filename
             )
             os.system(command)
 
@@ -87,3 +87,96 @@ class ibacop(Portfolio):
 
             with os.path.join(tempdir, "global_features.arff") as file_features:
                 return file_features.readlines()
+
+    def create_model(self, features) -> str:
+        # per funzionare ha bisogno di:
+        # weka all'interno della dir current_path/models/
+        # e crea il .model in current_path (ovvero dove c'è il file ibacop.py)
+        current_path = os.path.dirname(__file__)
+        with tempfile.TemporaryDirectory() as tempdir:
+            features_path = os.path.join(tempdir, "global_features.arff")
+
+            with open(features_path, "w") as file:
+                for line in features:
+                    # write each item on a new line
+                    file.write("%s\n" % line)
+
+            # Call to `weka.jar` to remove unused `features`
+            command = (
+                "java -cp "
+                + current_path
+                + "/models/weka.jar -Xms256m -Xmx1024m weka.filters.unsupervised.attribute.Remove -R 1-3,18,20,65,78-79,119-120 -i "
+                + features_path
+                + " -o "
+                + tempdir
+                + "/global_features_simply.arff"
+            )
+            os.system(command)
+
+            # Save the model created
+            command = (
+                "java -Xms256m -Xmx1024m -cp "
+                + current_path
+                + "/models/weka.jar weka.classifiers.meta.RotationForest  -t "
+                + tempdir
+                + "/global_features_simply.arff -d "
+                + current_path
+                + "/RotationForest.model"
+            )
+            os.system(command)
+
+            model_path = os.path.join(current_path, "RotationForest.model")
+            if os.path.isfile(model_path):
+                return model_path
+            else:
+                return None
+
+    def get_prediction(self, features, model_path) -> List[str]:
+        current_path = os.path.dirname(__file__)
+        with tempfile.TemporaryDirectory() as tempdir:
+
+            features_path = os.path.join(tempdir, "global_features.arff")
+            with open(features_path, "w") as file:
+                for line in features:
+                    # write each item on a new line
+                    file.write("%s\n" % line)
+
+            # Call to `weka.jar` to remove unused `features`
+            command = (
+                "java -cp "
+                + current_path
+                + "/models/weka.jar -Xms256m -Xmx1024m weka.filters.unsupervised.attribute.Remove -R 1-3,18,20,65,78-79,119-120 -i "
+                + features_path
+                + " -o "
+                + tempdir
+                + "/global_features_simply.arff"
+            )
+            os.system(command)
+            # far predirre a weka
+            # ottiene la lista dei pianificatori ordinata per probabilità di successo
+            command = (
+                "java -Xms256m -Xmx1024m -cp "
+                + current_path
+                + "/models/weka.jar weka.classifiers.meta.RotationForest -l "
+                + model_path
+                + " -T "
+                + tempdir
+                + "/global_features_simply.arff -p 113 > "
+                + tempdir
+                + "/outputModel"
+            )
+            os.system(command)
+            # The `model` creates the `list` of ALL planners relative to their probability of solving the `problem`
+            command = (
+                "python2.7 "
+                + current_path
+                + "/models/parseWekaOutputFile.py "
+                + tempdir
+                + "/outputModel "
+                + tempdir
+                + "/listPlanner"
+            )
+            os.system(command)
+
+            with open(os.path.join(tempdir, "listPlanner"), "r") as file:
+                return file.readlines()

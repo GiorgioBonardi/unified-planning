@@ -53,6 +53,21 @@ class Portfolio:
         :return: True if the extraction was succesfully made
         """
 
+    def create_model(self, features: List[str]) -> str:  # o dataset?
+        """
+        Return the path to the model or None if some errors occurred
+        """
+
+    def get_prediction(
+        self,
+        features: List[str],  # o dataset?
+        model_path,
+    ) -> List[str]:
+        """
+        Takes a list of features and a model and returns a list of ALL planners relative to their probability of solving the `problem`
+        (o si potrebbe tornare: the prediction of the model)
+        """
+
     # Function using the planners present in a given list to solve a given problem
     def solve_with_portfolio(
         self,
