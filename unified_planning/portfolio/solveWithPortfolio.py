@@ -43,12 +43,7 @@ def _solveWithPortfolio(plannerList, timeLimit, problem):
     :param problem: Parsed problem to be solved
     :return: First not null `plan` found, otherwise `None`
     """
-    # Check if arguments are correct
-
-    # Check if the `plannerList` is empty
     assert plannerList, "Planner list is empty!"
-
-    # Check if the `timeLimit` has an invalid value
     assert timeLimit > 0, "Invalid quantity of time assigned!"
 
     # Calculate time to allocate to each planner
@@ -106,7 +101,7 @@ def _solveWithPortfolio(plannerList, timeLimit, problem):
                     print(val.status)
                     if val.status == ValidationResultStatus.VALID:
                         # Return the first correctly validated `plan`
-                        return plan
+                        return result
                 except:
                     print(
                         f"{p} has encountered an exception while attempting to validate the plan"

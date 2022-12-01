@@ -52,7 +52,12 @@ class Portfolio:
         """
 
     # Function using the planners present in a given list to solve a given problem
-    def solve_with_portfolio(self, plannerList, timeLimit, problem):
+    def solve_with_portfolio(
+        self,
+        plannerList: List[str],
+        timeLimit: int,
+        problem: "up.model.AbstractProblem",
+    ) -> "up.engines.results.PlanGenerationResult":
         """
         Returns the first `plan` found by a planner inside the `list` given.
 
@@ -122,7 +127,7 @@ class Portfolio:
                         print(val.status)
                         if val.status == ValidationResultStatus.VALID:
                             # Return the first correctly validated `plan`
-                            return plan
+                            return result
                     except:
                         print(
                             f"{p} has encountered an exception while attempting to validate the plan"
