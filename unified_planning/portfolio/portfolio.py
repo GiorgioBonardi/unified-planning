@@ -1,7 +1,9 @@
 """This module defines the portfolio interface."""
 import unified_planning as up
-from unified_planning.engines import ValidationResultStatus
-from unified_planning.shortcuts import OneshotPlanner, PlanValidator
+
+# from unified_planning.engines import ValidationResultStatus
+from unified_planning.shortcuts import OneshotPlanner  # , PlanValidator
+from unified_planning.exceptions import UPException
 from multiprocessing import Process, Pipe
 from typing import List
 
@@ -59,12 +61,12 @@ class Portfolio:
         problem: "up.model.AbstractProblem",
     ) -> "up.engines.results.PlanGenerationResult":
         """
-        Returns the first `plan` found by a planner inside the `list` given.
+        Returns the first `result` found by a planner inside the `list` given.
 
         :param plannerList: List of planners to use
         :param timeLimit: Maximum time limit to run the operation
         :param problem: Parsed problem to be solved
-        :return: First not null `plan` found, otherwise `None`
+        :return: First not null `result` found, otherwise `None`
         """
 
         assert plannerList, "Planner list is empty!"
@@ -101,6 +103,7 @@ class Portfolio:
                             raise result
                         proc.terminate()
                         proc.join()
+                        return result
                     else:
                         # The sub-process couldn't finish excecution in time
                         print(
@@ -116,26 +119,24 @@ class Portfolio:
                     )
                     continue
 
-                plan = result.plan
-
-                if plan is not None:
-                    # Validate the plan found
-                    print(f"{p} found this plan: {plan}")
-                    try:
-                        with PlanValidator(problem_kind=problem.kind) as validator:
-                            val = validator.validate(problem, plan)
-                        print(val.status)
-                        if val.status == ValidationResultStatus.VALID:
-                            # Return the first correctly validated `plan`
-                            return result
-                    except:
-                        print(
-                            f"{p} has encountered an exception while attempting to validate the plan"
-                        )
-                        continue
-                else:
-                    print(f"{p} couldn't find a plan")
-        return None
+                # if plan is not None:
+                #     # Validate the plan found
+                #     print(f"{p} found this plan: {plan}")
+                #     try:
+                #         with PlanValidator(problem_kind=problem.kind) as validator:
+                #             val = validator.validate(problem, plan)
+                #         print(val.status)
+                #         if val.status == ValidationResultStatus.VALID:
+                #             # Return the first correctly validated `plan`
+                #             return result
+                #     except:
+                #         print(
+                #             f"{p} has encountered an exception while attempting to validate the plan"
+                #         )
+                #         continue
+                # else:
+                #     print(f"{p} couldn't find a plan")
+        raise UPException("Portfolio failed to find a plan")
 
     def destroy(self):
         pass
