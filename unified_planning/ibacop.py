@@ -1,12 +1,12 @@
 import os
 import unified_planning as up
-from unified_planning import portfolio
+from unified_planning.portfolio.portfolio import Portfolio
 from unified_planning.io.pddl_writer import PDDLWriter
 from typing import List
 import tempfile
 
 
-class ibacop(portfolio.Portfolio):
+class ibacop(Portfolio):
     def __init__(self):
         super.__init__("ibacop")
 
@@ -25,6 +25,17 @@ class ibacop(portfolio.Portfolio):
             print("\n***start extract features***\n")
             # features
             command = (
+                "python2.7 "
+                + current_path
+                + "/features/translate/translate.py "
+                + domain_filename
+                + " "
+                + problem
+            )
+            print(command)
+            os.system(command)
+
+            command = (
                 current_path
                 + "/features/preprocess/preprocess < "
                 + tempdir
@@ -37,7 +48,7 @@ class ibacop(portfolio.Portfolio):
                 + "/features/ff-learner/roller3.0 -o "
                 + domain_filename
                 + " -f "
-                + problem_filename
+                + problem
                 + " -S 28"
             )
             os.system(command)
@@ -47,7 +58,7 @@ class ibacop(portfolio.Portfolio):
                 + "/features/heuristics/training.sh "
                 + domain_filename
                 + " "
-                + problem_filename
+                + problem
             )
             os.system(command)
 
@@ -65,16 +76,6 @@ class ibacop(portfolio.Portfolio):
                 + tempdir
                 + "/output"
             )
-            os.system(command)
-            command = (
-                "python2.7 "
-                + current_path
-                + "/features/translate/translate.py "
-                + domain_filename
-                + " "
-                + problem_filename
-            )
-            print(command)
             os.system(command)
 
             # join file
