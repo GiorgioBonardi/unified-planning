@@ -68,6 +68,46 @@ class Portfolio:
         (o si potrebbe tornare: the prediction of the model)
         """
 
+    # primitiva 2
+    def portfolio_specific_problem(
+        self, problem, planners_requested, n_planners_allowed
+    ):
+        """
+        Returns the `list` of `planners` to be used to solve the given `problem`, sorted by probability of success.
+
+        :param domain: `Domain` of the `problem` to be solved
+        :param problem: `Problem` to be solved
+        :param planners_requested: List of 'planners' who support the 'problem'
+        :param n_planners_allowed: Number of `planners` allowed in the portfolio
+
+        :return: `List` of `planners` ordered by probability of success
+        """
+        assert isinstance(problem, up.model.Problem)
+        assert n_planners_allowed > 1, "at least one planner is required"
+        assert (
+            planners_requested >= n_planners_allowed
+        ), "the list of planners must be grater or equal to the number of planners"
+
+        list_planners = []
+        # Extracting `features` of the given `problem`
+        features = self.extract_features(problem)
+        model_path = self.create_model(features)
+        model_prediction_list = self.get_prediction(
+            features, model_path
+        )  # nome variabile mhe
+
+        x = 0
+        for line in model_prediction_list:
+            line = line.strip()
+            if line in planners_requested:
+                list_planners.append(line)
+                x += 1
+            if x == n_planners_allowed:
+                break
+
+        return list_planners
+
+    # primitive 2
     # Function using the planners present in a given list to solve a given problem
     def solve_with_portfolio(
         self,

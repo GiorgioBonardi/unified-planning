@@ -88,7 +88,7 @@ def extract_features(original_domain, original_problem, rootpathOutput):
 
 # TODO: Possible CHECK for existance of `domain` and `problem`
 # TODO: Possible CHECK for `planners_requested` size to be >= n with n > 1
-def portfolio_specific_problem(problem, planners_requested, planners_allowed):
+def portfolio_specific_problem(problem, planners_requested, n_planners_allowed):
     """
     Returns the `list` of `planners` to be used to solve the given `problem`, sorted by probability of success.
 
@@ -100,9 +100,9 @@ def portfolio_specific_problem(problem, planners_requested, planners_allowed):
     :return: `List` of `planners` ordered by probability of success
     """
     assert isinstance(problem, up.model.Problem)
-    assert planners_allowed > 1, "at least one planner is required"
+    assert n_planners_allowed > 1, "at least one planner is required"
     assert (
-        planners_requested >= planners_allowed
+        planners_requested >= n_planners_allowed
     ), "the list of planners must be grater or equal to the number of planners"
 
     # Extracting `features` of the given `problem`
@@ -157,7 +157,7 @@ def portfolio_specific_problem(problem, planners_requested, planners_allowed):
                 if line in planners_requested:
                     list_planners.append(line)
                     x += 1
-                if x == planners_allowed:
+                if x == n_planners_allowed:
                     break
 
         return list_planners
