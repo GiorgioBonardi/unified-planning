@@ -100,7 +100,7 @@ class Portfolio:
         assert isinstance(problem, up.model.Problem)
         assert n_planners_allowed > 1, "at least one planner is required"
         assert (
-            planners_requested >= n_planners_allowed
+            len(planners_requested) >= n_planners_allowed
         ), "the list of planners must be grater or equal to the number of planners"
 
         list_planners = []

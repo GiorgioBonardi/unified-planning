@@ -31,8 +31,13 @@ ibacop = Ibacop(
     os.path.join(rootpath, "RotationForest.model"),
 )
 
-features = ibacop.extract_features(problem)
+# features = ibacop.extract_features(problem)
 
-prediction_list = ibacop.get_prediction(features)
+plannerList = ibacop.portfolio_specific_problem(problem, ["tamer", "lpg"], 2)
 
-print(prediction_list)
+print(plannerList)
+# features = ibacop.extract_features(problem)
+
+# prediction_list = ibacop.get_prediction(features)
+
+# print(prediction_list)
