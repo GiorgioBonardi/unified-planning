@@ -144,6 +144,8 @@ class Ibacop(Portfolio):
                     # write each item on a new line
                     file.write("%s\n" % line)
 
+            os.chdir(tempdir)
+
             # Call to `weka.jar` to remove unused `features`
             command = (
                 "java -cp "
@@ -161,7 +163,7 @@ class Ibacop(Portfolio):
                 "java -Xms256m -Xmx1024m -cp "
                 + current_path
                 + "/models/weka.jar weka.classifiers.meta.RotationForest -l "
-                + self.model_path()
+                + self.model_path
                 + " -T "
                 + tempdir
                 + "/global_features_simply.arff -p 113 > "
