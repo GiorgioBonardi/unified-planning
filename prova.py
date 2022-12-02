@@ -25,8 +25,11 @@ reader = PDDLReader()
 # problem = rootpath + "/domain/p01.pddl"
 # domain = rootpath + "/domain/domain.pddl"
 # parsed_problem = reader.parse_problem(domain, problem)
-print(os.path.join(rootpath,"RotationForest.model"))
-ibacop = Ibacop(["tamer", "enhsp","fast-downward","lpg"], os.path.join(rootpath,"RotationForest.model"))
+print(os.path.join(rootpath, "RotationForest.model"))
+ibacop = Ibacop(
+    ["tamer", "enhsp", "fast-downward", "lpg"],
+    os.path.join(rootpath, "RotationForest.model"),
+)
 
 features = ibacop.extract_features(problem)
 
