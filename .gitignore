@@ -5,6 +5,7 @@ unified_planning/features
 unified_planning/models
 unified_planning/search
 unified_planning/search-mercury
+RotationForest.model
 coverage.xml
 .planners/
 __pycache__/
