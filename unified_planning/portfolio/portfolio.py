@@ -28,8 +28,29 @@ class Portfolio:
     Represents the portfolio interface that must be implemented.
     """
 
-    # def __init__(self, name):
-    #     self.name = name
+    def __init__(self, planner_list, model_path):
+        self._planner_list = planner_list
+        self._model_path = model_path
+
+    @property
+    def planner_list(self) -> List[str]:
+        """ """
+        return self._planner_list
+
+    @planner_list.setter
+    def planner_list(self, new_value: List[str]):
+        """ """
+        self._planner_list = new_value
+
+    @property
+    def model_path(self) -> str:
+        """ """
+        return self._model_path
+
+    @model_path.setter
+    def model_path(self, new_value: str):
+        """ """
+        self._model_path = new_value
 
     # @property
     # def name(self) -> str:
@@ -55,7 +76,6 @@ class Portfolio:
     def get_prediction(
         self,
         features: List[str],  # o dataset?
-        model_path,
     ) -> List[str]:
         """
         Takes a list of features and a model and returns a list of ALL planners relative to their probability of solving the `problem`
@@ -86,10 +106,7 @@ class Portfolio:
         list_planners = []
         # Extracting `features` of the given `problem`
         features = self.extract_features(problem)
-        model_path = self.create_model(features)
-        model_prediction_list = self.get_prediction(
-            features, model_path
-        )  # nome variabile mhe
+        model_prediction_list = self.get_prediction(features)  # nome variabile mhe
 
         x = 0
         for line in model_prediction_list:

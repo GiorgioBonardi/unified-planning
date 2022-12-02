@@ -6,13 +6,13 @@ from typing import List
 import tempfile
 
 
-class ibacop(Portfolio):
-    def __init__(self):
-        super.__init__("ibacop")
+class Ibacop(Portfolio):
+    def __init__(self, planner_list, model_path):
+        super().__init__(planner_list, model_path)
 
     def extract_features(self, problem: "up.model.AbstractProblem") -> List[str]:
         current_path = os.path.dirname(__file__)
-        # guarda riga 180 di ppdl_planner
+
         w = PDDLWriter(problem, True)
         with tempfile.TemporaryDirectory() as tempdir:
             domain_filename = os.path.join(tempdir, "domain.pddl")
@@ -79,8 +79,20 @@ class ibacop(Portfolio):
             os.system(command)
 
             # join file
+            fake_result = []
+            for p in self.planner_list():
+                fake_result.append(p + ",?")
+
+            res_planner_str = str(fake_result)[1:-1:1].replace("',", "'")
             actual_rootpath = current_path + "/models"
-            command = "python2.7 " + actual_rootpath + "/joinFile.py " + tempdir
+            command = (
+                "python2.7 "
+                + actual_rootpath
+                + "/joinFile.py "
+                + tempdir
+                + " "
+                + res_planner_str
+            )
             os.system(command)
 
             print("\n***end extract features***\n")
@@ -131,7 +143,7 @@ class ibacop(Portfolio):
             else:
                 return None
 
-    def get_prediction(self, features, model_path) -> List[str]:
+    def get_prediction(self, features) -> List[str]:
         current_path = os.path.dirname(__file__)
         with tempfile.TemporaryDirectory() as tempdir:
 
@@ -158,7 +170,7 @@ class ibacop(Portfolio):
                 "java -Xms256m -Xmx1024m -cp "
                 + current_path
                 + "/models/weka.jar weka.classifiers.meta.RotationForest -l "
-                + model_path
+                + self.model_path()
                 + " -T "
                 + tempdir
                 + "/global_features_simply.arff -p 113 > "
