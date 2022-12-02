@@ -1,6 +1,10 @@
 unified_planning.egg-info/
 build/
 .coverage
+unified_planning/features
+unified_planning/models
+unified_planning/search
+unified_planning/search-mercury
 coverage.xml
 .planners/
 __pycache__/

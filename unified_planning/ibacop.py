@@ -1,9 +1,9 @@
 import os
 import unified_planning as up
-from portfolio.portfolio import Portfolio
+from unified_planning.portfolio.portfolio import Portfolio
 from unified_planning.io.pddl_writer import PDDLWriter
 from typing import List
-from models import joinFile
+from unified_planning.models import joinFile
 import tempfile
 
 
@@ -81,26 +81,14 @@ class Ibacop(Portfolio):
 
             # join file
             fake_result = []
-            for p in self.planner_list():
+            for p in self.planner_list:
                 fake_result.append(p + ",?")
 
-            joinFile.create_globals(tempdir, fake_result, self.planner_list())
-
-            # res_planner_str = str(fake_result)[1:-1:1].replace("',", "'")
-            # actual_rootpath = current_path + "/models"
-            # command = (
-            #     "python2.7 "
-            #     + actual_rootpath
-            #     + "/joinFile.py "
-            #     + tempdir
-            #     + " "
-            #     + res_planner_str
-            # )
-            # os.system(command)
+            joinFile.create_globals(tempdir, fake_result, self.planner_list)
 
             print("\n***end extract features***\n")
 
-            with os.path.join(tempdir, "global_features.arff") as file_features:
+            with open(os.path.join(tempdir, "global_features.arff")) as file_features:
                 return file_features.readlines()
 
     def create_model(self, features) -> str:
