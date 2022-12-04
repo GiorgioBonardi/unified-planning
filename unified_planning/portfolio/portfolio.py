@@ -28,19 +28,19 @@ class Portfolio:
     Represents the portfolio interface that must be implemented.
     """
 
-    def __init__(self, planner_list, model_path):
-        self._planner_list = planner_list
+    def __init__(self, model_path):
+        # self._planner_list = planner_list
         self._model_path = model_path
 
-    @property
-    def planner_list(self) -> List[str]:
-        """ """
-        return self._planner_list
+    # @property
+    # def planner_list(self) -> List[str]:
+    #     """ """
+    #     return self._planner_list
 
-    @planner_list.setter
-    def planner_list(self, new_value: List[str]):
-        """ """
-        self._planner_list = new_value
+    # @planner_list.setter
+    # def planner_list(self, new_value: List[str]):
+    #     """ """
+    #     self._planner_list = new_value
 
     @property
     def model_path(self) -> str:
@@ -61,14 +61,18 @@ class Portfolio:
     # def name(self, name) -> str:
     #     self._name = name
 
-    def extract_features(self, problem: "up.model.AbstractProblem") -> List[str]:
+    def extract_features(
+        self, problem: "up.model.AbstractProblem", planner_list: List[str]
+    ) -> List[str]:
         """
         Takes a problem and returns a list of strings containing its features
         :param problem: The up.model.AbstractProblem instance from which to extract the features.
         :return: List of lines representing the extracted features
         """
-    
-    def extract_features(self, domain_path: str, problem_path: str) -> List[str]:
+
+    def extract_features(
+        self, domain_path: str, problem_path: str, planner_list: List[str]
+    ) -> List[str]:
         """
         Takes a problem and returns a list of strings containing its features
         :param problem: The up.model.AbstractProblem instance from which to extract the features.
@@ -105,7 +109,7 @@ class Portfolio:
         :return: List of planners ordered by probability of success
         """
         assert isinstance(problem, up.model.Problem)
-        assert n_planners_allowed > 1, "at least one planner is required"
+        assert n_planners_allowed >= 1, "at least one planner is required"
         assert (
             len(planners_requested) >= n_planners_allowed
         ), "the list of planners must be grater or equal to the number of planners"

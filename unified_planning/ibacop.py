@@ -10,8 +10,11 @@ import tempfile
 class Ibacop(Portfolio):
     def __init__(self, planner_list, model_path):
         super().__init__(planner_list, model_path)
+        # qua inizializzi head + var default O file? vedi discord
 
-    def extract_features(self, problem: "up.model.AbstractProblem") -> List[str]:
+    def extract_features(
+        self, problem: "up.model.AbstractProblem", planner_list: List[str]
+    ) -> List[str]:
         current_path = os.path.dirname(__file__)
 
         w = PDDLWriter(problem, True)
@@ -81,23 +84,22 @@ class Ibacop(Portfolio):
 
             # join file
             fake_result = []
-            for p in self.planner_list:
+            for p in planner_list:
                 fake_result.append(p + ",?")
 
-            joinFile.create_globals(tempdir, fake_result, self.planner_list)
+            joinFile.create_globals(tempdir, fake_result, planner_list)
 
             print("\n***end extract features***\n")
 
             with open(os.path.join(tempdir, "global_features.arff")) as file_features:
                 return file_features.readlines()
 
-    def extract_features(self, domain_path: str, problem_path: str) -> List[str]:
+    def extract_features(
+        self, domain_path: str, problem_path: str, planner_list: List[str]
+    ) -> List[str]:
         current_path = os.path.dirname(__file__)
 
         with tempfile.TemporaryDirectory() as tempdir:
-            domain_path = os.path.join(current_path, "domain.pddl")
-            problem_path = os.path.join(current_path, "problem.pddl")
-
             # need to change the working dir for the following commands to work properly
             os.chdir(tempdir)
             print("\n***start extract features***\n")
@@ -158,10 +160,10 @@ class Ibacop(Portfolio):
 
             # join file
             fake_result = []
-            for p in self.planner_list:
+            for p in planner_list:
                 fake_result.append(p + ",?")
 
-            joinFile.create_globals(tempdir, fake_result, self.planner_list)
+            joinFile.create_globals(tempdir, fake_result, planner_list)
 
             print("\n***end extract features***\n")
 
