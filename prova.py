@@ -8,22 +8,22 @@ from unified_planning.shortcuts import *
 
 rootpath = os.path.dirname(__file__)
 
-# creation of problem
-x = Fluent("x")
+# # creation of problem
+# x = Fluent("x")
 
-a = InstantaneousAction("a")
-a.add_precondition(Not(x))
-a.add_effect(x, True)
+# a = InstantaneousAction("a")
+# a.add_precondition(Not(x))
+# a.add_effect(x, True)
 
-problem = Problem("basic")
-problem.add_fluent(x)
-problem.add_action(a)
-problem.set_initial_value(x, False)
-problem.add_goal(x)
+# problem = Problem("basic")
+# problem.add_fluent(x)
+# problem.add_action(a)
+# problem.set_initial_value(x, False)
+# problem.add_goal(x)
 
-reader = PDDLReader()
-# problem = rootpath + "/domain/p01.pddl"
-# domain = rootpath + "/domain/domain.pddl"
+# reader = PDDLReader()
+problem = rootpath + "/domain/p01.pddl"
+domain = rootpath + "/domain/domain.pddl"
 # parsed_problem = reader.parse_problem(domain, problem)
 print(os.path.join(rootpath, "RotationForest.model"))
 ibacop = Ibacop(
@@ -31,7 +31,9 @@ ibacop = Ibacop(
     os.path.join(rootpath, "RotationForest.model"),
 )
 
-# features = ibacop.extract_features(problem)
+# features = ibacop.extract_features(domain, problem)
+# print(features)
+
 
 plannerList = ibacop.portfolio_specific_problem(problem, ["tamer", "lpg"], 2)
 

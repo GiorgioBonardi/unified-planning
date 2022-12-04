@@ -67,6 +67,13 @@ class Portfolio:
         :param problem: The up.model.AbstractProblem instance from which to extract the features.
         :return: List of lines representing the extracted features
         """
+    
+    def extract_features(self, domain_path: str, problem_path: str) -> List[str]:
+        """
+        Takes a problem and returns a list of strings containing its features
+        :param problem: The up.model.AbstractProblem instance from which to extract the features.
+        :return: List of lines representing the extracted features
+        """
 
     def create_model(self, features: List[str]) -> str:  # o dataset?
         """
