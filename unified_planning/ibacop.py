@@ -2,6 +2,7 @@ import os
 import unified_planning as up
 from unified_planning.portfolio.portfolio import Portfolio
 from unified_planning.io.pddl_writer import PDDLWriter
+from unified_planning.exceptions import UPException
 from typing import List
 from unified_planning.models import joinFile
 import tempfile
@@ -13,16 +14,28 @@ class Ibacop(Portfolio):
         # qua inizializzi head + var default O file? vedi discord
 
     def extract_features(
-        self, problem: "up.model.AbstractProblem", planner_list: List[str]
+        self,
+        planner_list: List[str],
+        problem: "up.model.AbstractProblem" = None,
+        domain_path: str = None,
+        problem_path: str = None,
     ) -> List[str]:
         current_path = os.path.dirname(__file__)
 
-        w = PDDLWriter(problem, True)
         with tempfile.TemporaryDirectory() as tempdir:
-            domain_filename = os.path.join(tempdir, "domain.pddl")
-            problem_filename = os.path.join(tempdir, "problem.pddl")
-            w.write_domain(domain_filename)
-            w.write_problem(problem_filename)
+            if problem is not None:
+                w = PDDLWriter(problem, True)
+                domain_filename = os.path.join(tempdir, "domain.pddl")
+                problem_filename = os.path.join(tempdir, "problem.pddl")
+                w.write_domain(domain_filename)
+                w.write_problem(problem_filename)
+            elif domain_path is not None and problem_path is not None:
+                domain_filename = domain_path
+                problem_filename = problem_path
+            else:
+                raise UPException(
+                    "You need to pass an AbstractProblem or the domain and problem path"
+                )
 
             # need to change the working dir for the following commands to work properly
             os.chdir(tempdir)
@@ -63,82 +76,6 @@ class Ibacop(Portfolio):
                 + domain_filename
                 + " "
                 + problem_filename
-            )
-            os.system(command)
-
-            command = (
-                current_path
-                + '/search/downward --landmarks "lm=lm_merged([lm_hm(m=1),lm_rhw(),lm_zg()])" < '
-                + tempdir
-                + "/output"
-            )
-            os.system(command)
-
-            command = (
-                current_path
-                + "/search-mercury/downward ipc seq-agl-mercury <"
-                + tempdir
-                + "/output"
-            )
-            os.system(command)
-
-            # join file
-            fake_result = []
-            for p in planner_list:
-                fake_result.append(p + ",?")
-
-            joinFile.create_globals(tempdir, fake_result, planner_list)
-
-            print("\n***end extract features***\n")
-
-            with open(os.path.join(tempdir, "global_features.arff")) as file_features:
-                return file_features.readlines()
-
-    def extract_features(
-        self, domain_path: str, problem_path: str, planner_list: List[str]
-    ) -> List[str]:
-        current_path = os.path.dirname(__file__)
-
-        with tempfile.TemporaryDirectory() as tempdir:
-            # need to change the working dir for the following commands to work properly
-            os.chdir(tempdir)
-            print("\n***start extract features***\n")
-            # features
-            command = (
-                "python2.7 "
-                + current_path
-                + "/features/translate/translate.py "
-                + domain_path
-                + " "
-                + problem_path
-            )
-            print(command)
-            os.system(command)
-
-            command = (
-                current_path
-                + "/features/preprocess/preprocess < "
-                + tempdir
-                + "/output.sas"
-            )
-            os.system(command)
-
-            command = (
-                current_path
-                + "/features/ff-learner/roller3.0 -o "
-                + domain_path
-                + " -f "
-                + problem_path
-                + " -S 28"
-            )
-            os.system(command)
-
-            command = (
-                current_path
-                + "/features/heuristics/training.sh "
-                + domain_path
-                + " "
-                + problem_path
             )
             os.system(command)
 

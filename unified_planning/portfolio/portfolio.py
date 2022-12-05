@@ -62,20 +62,17 @@ class Portfolio:
     #     self._name = name
 
     def extract_features(
-        self, problem: "up.model.AbstractProblem", planner_list: List[str]
+        self,
+        planner_list: List[str],
+        problem: "up.model.AbstractProblem" = None,
+        domain_path: str = None,
+        problem_path: str = None,
     ) -> List[str]:
         """
         Takes a problem and returns a list of strings containing its features
         :param problem: The up.model.AbstractProblem instance from which to extract the features.
-        :return: List of lines representing the extracted features
-        """
-
-    def extract_features(
-        self, domain_path: str, problem_path: str, planner_list: List[str]
-    ) -> List[str]:
-        """
-        Takes a problem and returns a list of strings containing its features
-        :param problem: The up.model.AbstractProblem instance from which to extract the features.
+        :param domain_path: The path of the domain
+        :param problem_path: The path of the problem
         :return: List of lines representing the extracted features
         """
 
