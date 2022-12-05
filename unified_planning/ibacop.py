@@ -9,8 +9,8 @@ import tempfile
 
 
 class Ibacop(Portfolio):
-    def __init__(self, planner_list, model_path):
-        super().__init__(planner_list, model_path)
+    def __init__(self, model_path):
+        super().__init__(model_path)
         # qua inizializzi head + var default O file? vedi discord
 
     def extract_features(

@@ -31,12 +31,13 @@ problem.add_goal(x)
 
 # Creation of ibacop specific portfolio
 ibacop = Ibacop(
-    ["tamer", "enhsp", "fast-downward", "lpg"],
     os.path.join(rootpath, "RotationForest.model"),
 )
 
 # Extraction of the features of a specific problem
-features = ibacop.extract_features(problem)
+features = ibacop.extract_features(
+    ["tamer", "enhsp", "fast-downward", "lpg"], problem=problem
+)
 print(
     f"The specific problem extracted presents the following features:\n\n{features}\n"
 )
@@ -50,7 +51,7 @@ print(
 prediction_list = ibacop.get_prediction(features)
 print(f"{prediction_list}")
 
-available_planners = ["tamer", "enhsp", "fast-downward"]
+available_planners = ["tamer", "enhsp", "fast-downward", "lpg"]
 print(f"\nPlanners that we would potentially like to use: {available_planners}")
 
 n = 2
@@ -59,7 +60,7 @@ print(f"\nNumber of maximum planners we want inside our portfolio: {n}")
 print(
     "\nUse the problem and the pre-existing model to retrieve N planners from the ones available to us. Those N planners are to be used to solve the problem"
 )
-newPortfolio = ibacop.portfolio_specific_problem(problem, available_planners, n)
+newPortfolio = ibacop.portfolio_specific_problem(available_planners, n, problem=problem)
 print(f"\nThe portfolio contains the following planners: {newPortfolio}")
 
 total_time_limit = 20

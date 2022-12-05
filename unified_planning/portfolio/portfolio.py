@@ -93,9 +93,11 @@ class Portfolio:
     # primitiva 2
     def portfolio_specific_problem(
         self,
-        problem: "up.model.AbstractProblem",
         planners_requested: List[str],
         n_planners_allowed: List[str],
+        problem: "up.model.AbstractProblem" = None,
+        domain_path: str = None,
+        problem_path: str = None,
     ) -> List[str]:
         """
         Returns the list of planners to be used to solve the given problem, sorted by probability of success.
@@ -105,7 +107,6 @@ class Portfolio:
         :param n_planners_allowed: Number of planners allowed in the portfolio
         :return: List of planners ordered by probability of success
         """
-        assert isinstance(problem, up.model.Problem)
         assert n_planners_allowed >= 1, "at least one planner is required"
         assert (
             len(planners_requested) >= n_planners_allowed
@@ -113,7 +114,22 @@ class Portfolio:
 
         list_planners = []
         # Extracting `features` of the given `problem`
-        features = self.extract_features(problem)
+        if problem is not None:
+            assert isinstance(problem, up.model.Problem)
+            features = self.extract_features(
+                planner_list=planners_requested, problem=problem
+            )
+        elif domain_path is not None and problem_path is not None:
+            features = self.extract_features(
+                planner_list=planners_requested,
+                problem_path=problem_path,
+                domain_path=domain_path,
+            )
+        else:
+            raise UPException(
+                "You need to pass an AbstractProblem or the domain and problem path"
+            )
+
         model_prediction_list = self.get_prediction(features)  # nome variabile mhe
 
         x = 0
