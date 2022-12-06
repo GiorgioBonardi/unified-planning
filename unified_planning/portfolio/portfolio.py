@@ -210,13 +210,14 @@ class Portfolio:
 
         raise UPException("Portfolio failed to find a plan")
 
-    def destroy(self):
-        pass
+    # necessary?
+    # def destroy(self):
+    #     pass
 
-    def __enter__(self):
-        """Manages entering a Context (i.e., with statement)"""
-        return self
+    # def __enter__(self):
+    #     """Manages entering a Context (i.e., with statement)"""
+    #     return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """Manages exiting from Context (i.e., with statement)"""
-        self.destroy()
+    # def __exit__(self, exc_type, exc_val, exc_tb):
+    #     """Manages exiting from Context (i.e., with statement)"""
+    #     self.destroy()

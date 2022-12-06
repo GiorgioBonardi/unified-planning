@@ -11,7 +11,7 @@ import tempfile
 class Ibacop(Portfolio):
     def __init__(self, model_path):
         super().__init__(model_path)
-        # qua inizializzi head + var default O file? vedi discord
+        # qua inizializzi head + var default o file? vedi discord
 
     def extract_features(
         self,
