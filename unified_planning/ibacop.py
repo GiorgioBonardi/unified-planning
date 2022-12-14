@@ -7,15 +7,24 @@ from typing import List
 from unified_planning.models import joinFile
 import tempfile
 
-
 class Ibacop(Portfolio):
-    def __init__(self, model_path):
+    def __init__(self, model_path, dataset_path):
         super().__init__(model_path)
-        # qua inizializzi head + var default o file? vedi discord
+        planner_list = self._init_planner_list(dataset_path)
+
+    def _init_planner_list(self, dataset_path):
+        word = "@attribute planner"
+        with open(dataset_path, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.find(word) != -1:
+                    line = line.replace(word, "")
+                    line = line.replace("{", "")
+                    line = line.replace("}", "")
+                    self.planner_list = line.strip().split(", ")
 
     def extract_features(
         self,
-        planner_list: List[str],
         problem: "up.model.AbstractProblem" = None,
         domain_path: str = None,
         problem_path: str = None,
@@ -96,11 +105,11 @@ class Ibacop(Portfolio):
             os.system(command)
 
             # join file
-            fake_result = []
-            for p in planner_list:
-                fake_result.append(p + ",?")
+            temp_result = []
+            for p in self.planner_list:
+                temp_result.append(p + ",?")
 
-            joinFile.create_globals(tempdir, fake_result, planner_list)
+            joinFile.create_globals(tempdir, temp_result, self.planner_list)
 
             print("\n***end extract features***\n")
 

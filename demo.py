@@ -30,13 +30,16 @@ problem.set_initial_value(x, False)
 problem.add_goal(x)
 
 # Creation of ibacop specific portfolio
+model_path = "RotationForest.model"
+dataset_path = "global_features_simply.arff"
 ibacop = Ibacop(
-    os.path.join(rootpath, "RotationForest.model"),
+    os.path.join(rootpath, model_path),
+    os.path.join(rootpath, dataset_path)
 )
 
 # Extraction of the features of a specific problem
 features = ibacop.extract_features(
-    ["tamer", "enhsp", "fast-downward", "lpg"], problem=problem
+    problem=problem
 )
 print(
     f"The specific problem extracted presents the following features:\n\n{features}\n"

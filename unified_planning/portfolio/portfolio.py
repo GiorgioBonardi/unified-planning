@@ -63,7 +63,6 @@ class Portfolio:
 
     def extract_features(
         self,
-        planner_list: List[str],
         problem: "up.model.AbstractProblem" = None,
         domain_path: str = None,
         problem_path: str = None,
