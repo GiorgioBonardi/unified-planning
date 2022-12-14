@@ -7,6 +7,7 @@ from typing import List
 from unified_planning.models import joinFile
 import tempfile
 
+
 class Ibacop(Portfolio):
     def __init__(self, model_path, dataset_path):
         super().__init__(model_path)
@@ -14,14 +15,15 @@ class Ibacop(Portfolio):
 
     def _init_planner_list(self, dataset_path):
         word = "@attribute planner"
-        with open(dataset_path, 'r') as f:
+        with open(dataset_path, "r") as f:
             lines = f.readlines()
             for line in lines:
                 if line.find(word) != -1:
                     line = line.replace(word, "")
                     line = line.replace("{", "")
                     line = line.replace("}", "")
-                    self.planner_list = line.strip().split(", ")
+                    line = line.replace(" ", "")
+                    self.planner_list = line.strip().split(",")
 
     def extract_features(
         self,
@@ -29,7 +31,9 @@ class Ibacop(Portfolio):
         domain_path: str = None,
         problem_path: str = None,
     ) -> List[str]:
+
         current_path = os.path.dirname(__file__)
+        current_wdir = os.getcwd()
 
         with tempfile.TemporaryDirectory() as tempdir:
             if problem is not None:
@@ -113,6 +117,8 @@ class Ibacop(Portfolio):
 
             print("\n***end extract features***\n")
 
+            # go back to the previously working dir
+            os.chdir(current_wdir)
             with open(os.path.join(tempdir, "global_features.arff")) as file_features:
                 return file_features.readlines()
 
@@ -161,6 +167,8 @@ class Ibacop(Portfolio):
 
     def get_prediction(self, features) -> List[str]:
         current_path = os.path.dirname(__file__)
+        current_wdir = os.getcwd()
+
         with tempfile.TemporaryDirectory() as tempdir:
 
             features_path = os.path.join(tempdir, "global_features.arff")
@@ -208,5 +216,7 @@ class Ibacop(Portfolio):
             )
             os.system(command)
 
+            # go back to the previously working dir
+            os.chdir(current_wdir)
             with open(os.path.join(tempdir, "listPlanner"), "r") as file:
                 return file.readlines()

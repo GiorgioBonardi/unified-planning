@@ -115,12 +115,9 @@ class Portfolio:
         # Extracting `features` of the given `problem`
         if problem is not None:
             assert isinstance(problem, up.model.Problem)
-            features = self.extract_features(
-                planner_list=planners_requested, problem=problem
-            )
+            features = self.extract_features(problem=problem)
         elif domain_path is not None and problem_path is not None:
             features = self.extract_features(
-                planner_list=planners_requested,
                 problem_path=problem_path,
                 domain_path=domain_path,
             )
